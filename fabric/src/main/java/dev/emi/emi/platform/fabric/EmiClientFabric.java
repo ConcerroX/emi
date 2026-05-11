@@ -15,15 +15,12 @@ import dev.emi.emi.runtime.EmiReloadManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketDecoder;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.resource.ResourceReloader;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-
-import org.jspecify.annotations.NonNull;
 
 public class EmiClientFabric implements ClientModInitializer {
 
@@ -31,7 +28,7 @@ public class EmiClientFabric implements ClientModInitializer {
 	public void onInitializeClient() {
 		EmiClient.init();
 		EmiData.init(reloader -> {
-			ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
+			ResourceLoader.get(ResourceType.CLIENT_RESOURCES).registerReloader(reloader.getEmiId(), new ResourceReloader() {
 
                 @Override
                 public CompletableFuture<Void> reload(Store store, Executor prepareExecutor,
@@ -42,11 +39,6 @@ public class EmiClientFabric implements ClientModInitializer {
                 @Override
 				public String getName() {
 					return reloader.getName();
-				}
-
-				@Override
-				public @NonNull Identifier getFabricId() {
-					return reloader.getEmiId();
 				}
 			});
 		});
